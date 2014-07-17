@@ -1,0 +1,6 @@
+alias clear='clear && date'
+alias cls='clear'
+alias clr='clear'
+alias ll='ls -la'
+alias l='ls -la'
+alias sublime='/Applications/Sublime\ Text.app/Contents/MacOS/Sublime\ Text &'

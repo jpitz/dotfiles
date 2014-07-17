@@ -1,0 +1,37 @@
+#!/bin/bash
+
+DOTFILES_ROOT="$HOME/.dotfiles"
+
+link_files () {
+    ln -s "$1" "$2"
+    echo "linked $1 to $2"
+}
+
+install_brew() {
+    ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+    brew doctor
+    brew install node
+    brew install z
+}
+
+install_dotfiles() {
+    files=$(find "$DOTFILES_ROOT" -maxdepth 2 -name \*.symlink -print)
+
+    for source in $files; do
+        file_base=$(basename "${source%.*}")
+        dest="$HOME/.$file_base"
+
+        if [ ! -f $dest ]; then
+            link_files "$source" "$dest"
+        fi
+    done
+}
+
+#------------------------------#
+# BOOTSTRAP
+#------------------------------#
+if [ ! -f `which brew` ]; then
+    install_brew
+fi
+
+install_dotfiles
