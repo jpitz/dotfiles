@@ -1,6 +1,6 @@
-#----------------------------#
-# Settings
-#----------------------------#
+#---------------------------#
+# Terminal
+#---------------------------#
 function servephp() {
     local port="${1:-8080}"
     open "http://localhost:${port}"
@@ -13,14 +13,18 @@ function serve() {
     python -m SimpleHTTPServer "$port"
 }
 
-#----------------------------#
+#---------------------------#
 # Application Scripts
-#----------------------------#
-. `brew --prefix`/etc/profile.d/z.sh
+#---------------------------#
+. /usr/local/Cellar/z/1.8/etc/profile.d/z.sh
 
-#----------------------------#
-# Source Other Files
-#----------------------------#
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+    . $(brew --prefix)/etc/bash_completion
+fi
+
+#---------------------------#
+# Source the world
+#---------------------------#
 if [ -f ~/.bash_exports ]; then
     source ~/.bash_exports
 fi
@@ -31,4 +35,8 @@ fi
 
 if [ -f ~/.bash_prompt ]; then
     source ~/.bash_prompt
+fi
+
+if [[ ! $TERM = "xterm" ]]; then
+    exec tmux
 fi
