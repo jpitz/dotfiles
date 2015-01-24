@@ -1,14 +1,16 @@
-[hub]
-    protocol = https
-
 [user]
     name = jpitz
+    email = jpitzeruse@gmail.com
 
 [credential]
     helper = osxkeychain
 
 [alias]
     co = checkout
+    promote = !$ZSH/bin/git-promote
+    wtf     = !$ZSH/bin/git-wtf
+    rank-contributors = !$ZSH/bin/git-rank-contributors
+    count   = !git shortlog -sn
 
 [color]
     diff = auto
@@ -19,6 +21,7 @@
 [core]
     excludesfile = ~/.gitignore
     editor = vim
+    autocrlf = input
 
 [apply]
     whitespace = nowarn
