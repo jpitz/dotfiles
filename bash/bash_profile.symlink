@@ -37,6 +37,6 @@ if [ -f ~/.bash_prompt ]; then
     source ~/.bash_prompt
 fi
 
-if [[ ! $TERM = "xterm" ]]; then
+if [[ ! $TERM =~ "screen" ]]; then
     exec tmux
 fi

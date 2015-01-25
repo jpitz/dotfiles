@@ -1,20 +1,46 @@
 #!/bin/bash
-
 DOTFILES_ROOT="$HOME/.dotfiles"
 
-link_files () {
+print_() {
+    echo ""
+    echo ""
+    echo "---- $1 ----"
+    echo ""
+    echo ""
+}
+
+link_files() {
     ln -s "$1" "$2"
     echo "linked $1 to $2"
 }
 
 install_brew() {
-    ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+    print_ "installing homebrew"
+    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     brew doctor
+}
+
+install_brew_packages() {
+    print_ "installing brew packages"
+    brew install tmux
     brew install node
     brew install z
+    brew doctor
+}
+
+install_vundle() {
+    print_ "installing vundle"
+    mkdir -p ~/.vim/bundle
+    git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/vundle
+}
+
+install_vundle_plugins() {
+    print_ "installing vundle plugins"
+    vim +PluginInstall +qall
 }
 
 install_dotfiles() {
+    print_ "installing all dotfiles"
     files=$(find "$DOTFILES_ROOT" -maxdepth 2 -name \*.symlink -print)
 
     for source in $files; do
@@ -30,8 +56,10 @@ install_dotfiles() {
 #------------------------------#
 # BOOTSTRAP
 #------------------------------#
-if [ ! -f `which brew` ]; then
-    install_brew
-fi
-
+install_brew
+install_brew_packages
 install_dotfiles
+install_vundle
+install_vundle_plugins
+
+source ~/.bash_profile
