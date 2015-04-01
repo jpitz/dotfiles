@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+if [ $# -ne 3 ]; then
+cat <<EOF
+usage: debug <file> <line> <char>
+
+  Places a carat at the designated character number <char> on line <line> if
+  file <file>.  Useful command when debugging scripts that do not do this for
+  you already.
+
+  file      The file we are debugging.
+  line      The line where an error occurred.
+  char      The character that caused the problem.
+
+EOF
+exit 1
+fi
+
+file=$1
+line=$2
+char=`expr $3 - 1`
+
+sed -n "${line}p" $file
+
+if [ $char -gt 0 ]; then
+    v=$(printf "%-${char}s" " ")
+else
+    v=''
+fi
+echo "${v// / }^"
