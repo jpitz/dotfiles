@@ -13,6 +13,7 @@ export LSCOLORS=GxFxCxDxBxegedabagaced
 export GOPATH=`launchctl getenv GOPATH`
 export GOROOT=`launchctl getenv GOROOT`
 
+PATH=$HOME/.dotfiles/bin:$PATH
 PATH=/usr/local/bin:$PATH
 PATH=$PATH:/usr/local/sbin
 PATH=$PATH:~/bin
