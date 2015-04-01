@@ -2,9 +2,6 @@
     name = jpitz
     email = jpitzeruse@gmail.com
 
-[credential]
-    helper = osxkeychain
-
 [alias]
     co = checkout
 
@@ -33,3 +30,5 @@
 
 [push]
     default = simple
+[credential]
+	helper = osxkeychain

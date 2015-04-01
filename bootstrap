@@ -9,6 +9,14 @@ print_() {
     echo ""
 }
 
+create_development_directories() {
+    print_ "creating development directories"
+    mkdir -p ~/Development/projects
+    mkdir -p ~/Development/github
+    mkdir -p ~/Development/sandbox
+    mkdir -p ~/Development/zulu
+}
+
 link_files() {
     ln -s "$1" "$2"
     echo "linked $1 to $2"

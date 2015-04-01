@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -e
+
+ack -i --color $1 | less -r
