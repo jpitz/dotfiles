@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+if [ $# -ne 1 ]; then
+cat <<EOF
+usage: git-prune <branch>
+
+  Kills the local copy of the branch locally and also deletes the remote
+  reference.  This command will only work if the designated branch has been
+  merged back into the mainstream.
+
+  branch    The name of the branch we are pruning
+
+EOF
+fi
+
+git fetch --prune
+
+local_exists=`git branch | grep $1`
+if [ "$local_exists" != "" ]; then
+    git branch -d $1 || {
+        exit 1;
+    }
+fi
+
+remote_exists=`git branch -r | grep $1`
+if [ "$remote_exists" != "" ]; then
+    git push origin :$1
+fi

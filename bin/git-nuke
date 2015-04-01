@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+if [ $# -ne 1 ]; then
+cat <<EOF
+usage: git-nuke <branch>
+
+  Kills the local copy of the branch locally and also deletes the remote
+  reference.  This command will output nothing if no changes occurred.
+
+  branch    The name of the branch we are nuking
+
+EOF
+fi
+
+git fetch --prune
+
+local_exists=`git branch | grep $1`
+if [ "$local_exists" != "" ]; then
+    git branch -D $1
+fi
+
+remote_exists=`git branch -r | grep $1`
+if [ "$remote_exists" != "" ]; then
+    git push origin :$1
+fi
