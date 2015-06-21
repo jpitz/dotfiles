@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+if [ $# -lt 2 ]; then
+cat <<EOF
+usage: gen-mvn <package> <name>
+
+  Generates a maven project with the provided package, initializes a git
+  repository, and performs the first commit.
+
+EOF
+exit 1
+fi
+
+
+project_package=$1
+project_name=$2
+
+mvn archetype:generate -DgroupId=${project_package} \
+   -DartifactId=${project_name} \
+   -DarchetypeArtifactId=maven-archetype-quickstart \
+   -DinteractiveMode=false
+
+cd $project_name
+
+curl "https://raw.githubusercontent.com/github/gitignore/master/Maven.gitignore" > .gitignore
+
+git init
+git add .
+git commit -m "Initial generated project"
