@@ -1,0 +1,60 @@
+#!/usr/bin/env php
+<?php
+function print_help() {
+  echo "
+  usage: json-groupby <term> [term...] < input.json
+         cat input.json | json-groupby <term> [term...]
+
+  Parse the incoming json and group the data by the specified terms
+  ";
+  exit(1);
+}
+
+function is_arraylist($var) {
+    return is_array($var) && !array_diff_key($var, array_keys(array_keys($var)));
+}
+
+function to_string($value) {
+    if (is_bool($value)) {
+        return $value ? 'true' : 'false';
+    }
+
+    return print_r($value, true);
+}
+
+function group_by_term($data, $term) {
+    $target = array();
+ 
+    if (is_arraylist($data)) {
+        foreach ($data as $doc) {
+            $string = to_string($doc[$term]);
+            if (!$target[$string]) $target[$string] = array();
+ 
+            array_push($target[$string], $doc);
+        }
+    } else {
+        foreach($data as $key => $value) {
+            $target[$key] = group_by_term($value, $term);
+        }
+    }
+ 
+    return $target;
+}
+
+function group_by($data, $terms) {
+    $grouped_data = $data;
+    foreach ($terms as $term) {
+        $grouped_data = group_by_term($grouped_data, $term);
+    }
+    return $grouped_data;
+}
+
+array_shift($argv);
+$terms = $argv;
+
+if (empty($terms)) print_help();
+
+$contents = file_get_contents("php://stdin");
+$input = json_decode($contents, true);
+
+echo json_encode(group_by($input, $terms), JSON_PRETTY_PRINT);

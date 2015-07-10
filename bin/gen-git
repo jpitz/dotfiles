@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+if [ $# -lt 1 ]; then
+cat <<EOF
+usage: gen-git <name> [languages...]
+
+  Generates a git project
+
+EOF
+exit 1
+fi
+
+name=$1
+shift
+
+if [ -d $name ]; then
+cat <<EOF
+Cannot create git project with name[$name].
+    Directory already exists.
+
+EOF
+exit 1
+fi
+
+mkdir -p $name
+cd $name
+
+while (( "$#" )); do
+    content=$(curl "https://raw.githubusercontent.com/github/gitignore/master/$1.gitignore")
+
+    if [ "$content" != "Not Found" ]; then 
+        echo $content >> .gitignore
+        echo "" >> .gitignore
+    fi
+
+    shift
+done
+
+echo "# $name" >> README.md
+echo "" >> README.md
+
+git init
+git add .
+git commit -m "Initial generated project"

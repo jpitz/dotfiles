@@ -1,0 +1,33 @@
+#!/usr/bin/env php
+<?php
+function print_help() {
+  echo "
+  usage: json-get <prop> < input.json
+         cat input.json | json-get <prop>
+
+  Parse the incoming json and return a single property json encoded.
+  ";
+  exit(1);
+}
+
+function to_string($value) {
+    if (is_bool($value)) {
+        return $value ? 'true' : 'false';
+    }
+
+    return print_r($value, true);
+}
+
+if (count($argv) < 2) print_help();
+
+array_shift($argv);
+$prop = array_shift($argv);
+
+$contents = file_get_contents("php://stdin");
+$input = json_decode($contents, true);
+
+if (is_array($input[$prop])) {
+    echo json_encode($input[$prop], JSON_PRETTY_PRINT);
+} else {
+    echo to_string($input[$prop]);
+}
