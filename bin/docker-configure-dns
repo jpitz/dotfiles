@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+while read network; do
+    current_domains=$(networksetup -getsearchdomains "${network}" | tr '\n' ' ')
+
+    if [ ! -z "$(echo ${current_domains} | grep "There aren't any Search Domains set on" )" ]; then
+        current_domains=$(scutil --dns | sed -n "0,/nameserver/{s/ *search domain\[[0-9]*\] : \(.*\)/\1/p}" | tr '\n' ' ')
+    fi
+
+    if [ -z "$(echo ${current_domains} | grep "node.consul")" ]; then
+        sudo networksetup -setsearchdomains "${network}" $current_domains node.consul
+    fi
+done < <(networksetup -listallnetworkservices | sed 1d)
+
+if [ -z "$(boot2docker ssh "cat /var/lib/boot2docker/profile" | grep EXTRA_ARGS)" ]; then
+    boot2docker ssh "echo $'EXTRA_ARGS=\"--insecure-registry 172.18.0.0/16 --insecure-registry 10.0.0.0/8 --bip=172.30.254.1/24\"' | sudo tee -a /var/lib/boot2docker/profile && sudo /etc/init.d/docker restart" &>/dev/null
+    boot2docker stop
+    boot2docker start
+fi
+
+if [ ! -d "/etc/resolver" ]; then
+    sudo mkdir /etc/resolver
+fi
+
+echo "nameserver $(boot2docker ip)" | sudo tee /etc/resolver/consul &>/dev/null
+
+current_dest=$(netstat -rn | sed -nr 's|^172.30.254/24\s*(\S*).*|\1|p')
+if [ "$current_dest" != "$(boot2docker ip)" ]; then
+    if [[ -n "$current_dest" ]]; then
+        sudo route -q delete '172.30.254.0/24'
+    fi
+
+    sudo route -q add '172.30.254.0/24' "$(boot2docker ip)"
+fi

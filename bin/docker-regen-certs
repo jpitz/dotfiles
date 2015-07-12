@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+boot2docker ssh 'sudo /etc/init.d/docker restart'

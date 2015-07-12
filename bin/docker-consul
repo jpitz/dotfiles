@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+container_name=consul
+docker-destroy ${container_name}
+docker run -dt -h node \
+    --name="${container_name}" \
+    --hostname="${container_name}" \
+    -p 53:53/udp \
+    -p 8500:8500 \
+    progrium/consul \
+    -server \
+    -bootstrap \
+    -advertise $(boot2docker ip)

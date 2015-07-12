@@ -20,4 +20,9 @@ PATH=$PATH:~/bin
 PATH=$PATH:/usr/local/opt/go/libexec/bin
 PATH=$PATH:$GOPATH/bin
 PATH=~/.local/bin:$PATH
+
+if [ -d "$(brew --prefix coreutils)/libexec/gnubin" ]; then
+    PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
+fi
+
 export PATH
