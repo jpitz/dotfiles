@@ -1,0 +1,39 @@
+#!/usr/bin/env php
+<?php
+$basedir = 'docker';
+$dockerini = "$basedir/docker.ini";
+
+if (!file_exists($basedir)) {
+    echo "Failed to locate the docker directory\n";
+    exit(1);
+}
+
+if (!file_exists($dockerini)) {
+    echo "Failed to locate a docker.ini file in docker\n";
+    exit(1);
+}
+
+$docker_config = parse_ini_file($dockerini, TRUE);
+
+foreach ($docker_config as $section => $config) {
+    $dockerfile = "$basedir/$section/Dockerfile";
+    $dockerrun = "$basedir/$section/run.sh";
+
+    $dockerfile_exists=file_exists($dockerfile);
+    $dockerrun_exists=file_exists($dockerrun);
+
+    if (!$dockerfile_exists && !$dockerrun_exists) {
+        echo "Failed to locate a Dockerfile or run.sh script for $section\n";
+        continue;
+    }
+
+    if ($dockerfile_exists) {
+        echo "Building $dockerfile\n";
+        passthru("docker build $basedir/$section");
+    }
+
+    if ($dockerrun_exists) {
+        echo "Executing $dockerrun\n";
+        passthru("./$dockerrun");
+    }
+}

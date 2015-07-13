@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+if [ $# -lt 1 ]; then
+cat <<EOF
+  usage: lookup <file>
+
+  Looks up the directory tree looking for a file name.  When the file is found,
+  the script prints the directory it was found in.
+
+EOF
+exit 1
+fi
+
+dir=$(pwd)
+file=$1
+found=true
+
+while [ ! -e "${dir}/${file}" ]; do
+    if [ "${dir}" == "/" ]; then
+        found=false
+        break
+    fi
+
+    dir=$(dirname $dir)
+done
+
+if $found; then
+    echo $dir
+fi
