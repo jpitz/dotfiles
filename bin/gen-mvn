@@ -17,7 +17,7 @@ project_name=$2
 
 mvn archetype:generate -DgroupId=${project_package} \
    -DartifactId=${project_name} \
-   -DarchetypeArtifactId=maven-archetype-quickstart \
+   -DarchetypeArtifactId=maven-archetype-webapp \
    -DinteractiveMode=false
 
 cd $project_name

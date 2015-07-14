@@ -15,6 +15,8 @@ if (!file_exists($dockerini)) {
 
 $docker_config = parse_ini_file($dockerini, TRUE);
 
+$current_user = get_current_user();
+
 foreach ($docker_config as $section => $config) {
     $dockerfile = "$basedir/$section/Dockerfile";
     $dockerrun = "$basedir/$section/run.sh";
@@ -29,7 +31,7 @@ foreach ($docker_config as $section => $config) {
 
     if ($dockerfile_exists) {
         echo "Building $dockerfile\n";
-        passthru("docker build $basedir/$section");
+        passthru("docker build -t $current_user/$section $basedir/$section");
     }
 
     if ($dockerrun_exists) {
