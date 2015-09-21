@@ -1,0 +1,236 @@
+#!/usr/bin/env node
+var util = require('util');
+var execSync = require('child_process').execSync;
+
+var availableArchetypes = {
+    'archetype': {
+        description: 'An archetype to generate a sample archetype project.',
+        archetypeGroupId: 'org.apache.maven.archetypes',
+        archetypeArtifactId: 'maven-archetype-archetype'
+    },
+    'j2ee-simple': {
+        description: 'An archetype to generate a simplifed sample J2EE application.',
+        archetypeGroupId: 'org.apache.maven.archetypes',
+        archetypeArtifactId: 'maven-archetype-j2ee-simple'
+    },
+    'mojo': {
+        description: 'An archetype to generate a sample a sample Maven plugin.',
+        archetypeGroupId: 'org.apache.maven.archetypes',
+        archetypeArtifactId: 'maven-archetype-mojo'
+    },
+    'plugin': {
+        description: 'An archetype to generate a sample Maven plugin.',
+        archetypeGroupId: 'org.apache.maven.archetypes',
+        archetypeArtifactId: 'maven-archetype-plugin'
+    },
+    'plugin-site': {
+        description: 'An archetype to generate a sample Maven plugin site.',
+        archetypeGroupId: 'org.apache.maven.archetypes',
+        archetypeArtifactId: 'maven-archetype-plugin-site'
+    },
+    'portlet': {
+        description: 'An archetype to generate a sample JSR-268 Portlet.',
+        archetypeGroupId: 'org.apache.maven.archetypes',
+        archetypeArtifactId: 'maven-archetype-portlet'
+    },
+    'quickstart': {
+        description: 'An archetype to generate a sample Maven project.',
+        archetypeGroupId: 'org.apache.maven.archetypes',
+        archetypeArtifactId: 'maven-archetype-quickstart'
+    },
+    'simple': {
+        description: 'An archetype to generate a simple Maven project.',
+        archetypeGroupId: 'org.apache.maven.archetypes',
+        archetypeArtifactId: 'maven-archetype-simple'
+    },
+    'site': {
+        description: 'An archetype to generate a sample Maven site which demonstrates some of the supported document types like APT, XDoc, and FML and demonstrates how to i18n your site.',
+        archetypeGroupId: 'org.apache.maven.archetypes',
+        archetypeArtifactId: 'maven-archetype-site'
+    },
+    'site-simple': {
+        description: 'An archetype to generate a sample Maven site.',
+        archetypeGroupId: 'org.apache.maven.archetypes',
+        archetypeArtifactId: 'maven-archetype-site-simple'
+    },
+    'webapp': {
+        description: 'An archetype to generate a sample Maven Webapp project.',
+        archetypeGroupId: 'org.apache.maven.archetypes',
+        archetypeArtifactId: 'maven-archetype-webapp'
+    },
+    'pom-root': {
+        description: 'Root project archetype for creating multi module projects',
+        archetypeGroupId: 'org.codehaus.mojo.archetypes',
+        archetypeArtifactId: 'pom-root'
+    }
+};
+
+var vcsCommand = {
+    'git': [
+        'git init',
+        'git add .',
+        'git commit -m "Initial generated project"'
+    ],
+    'none': []
+};
+
+var outputHelp = function() {
+    console.log();
+    console.log('  gen [OPTIONS] group project');
+    console.log();
+    console.log('    OPTIONS:');
+
+    console.log('            --vcs <vcs>        The version control system to use.');
+    console.log('      --archetype <archetype>  The archetype to generate your project from.');
+    console.log();
+    console.log('    ARCHETYPES:');
+
+    var longestKeyLength = 0;
+    var longestValueLength = 0;
+
+    Object.keys(availableArchetypes).forEach(function(archetype) {
+        var description = availableArchetypes[archetype].description;
+
+        longestKeyLength = Math.max(archetype.length, longestKeyLength);
+        longestValueLength = Math.max(description.length, longestValueLength);
+    });
+
+    var maxWidth = 80;
+    var print = function(line) {
+        var i = maxWidth;
+        while (i > -1) {
+            var charAt = line.charAt(i);
+            if (charAt == '' || charAt == ' ') {
+                break;
+            }
+            i--;
+        }
+
+        var printable = line.substr(0, i);
+        console.log(printable);
+
+        var remaining = line.substr(i + 1);
+        if (remaining.length > 0) {
+            var newLinePad = Array(7 + longestKeyLength + 3).join(' ');
+            var newLine = newLinePad + remaining;
+            print(newLine);
+        }
+    };
+
+    Object.keys(availableArchetypes).forEach(function(archetype) {
+        var pad = Array(7 + (longestKeyLength - archetype.length)).join(' ');
+        var description = availableArchetypes[archetype].description;
+        var line = pad + archetype + '   ' + description;
+        print(line);
+    });
+    console.log();
+};
+
+var Iterator = (function() {
+    var Iterator = Object.create(null);
+
+    Iterator.of = function(collection) {
+        var keys = Object.keys(collection);
+        var pos = 0;
+
+        var iter = Object.create(null);
+
+        iter.hasNext = function() {
+            return pos < keys.length;
+        };
+
+        iter.next = function() {
+            if (pos + 1 > keys.length) {
+                throw new Error('ArrayIndexOutOfBoundsException');
+            }
+
+            var key = keys[pos++];
+            var val = collection[key];
+
+            return {
+                key: key,
+                value: val
+            };
+        };
+
+        return iter;
+    };
+
+    return Iterator;
+}());
+
+var args = process.argv.slice(2);
+var argIterator = Iterator.of(args);
+
+var data = {
+    vcs: 'none',
+    archetype: 'quickstart',
+    _: []
+};
+
+while (argIterator.hasNext()) {
+    var arg = argIterator.next().value;
+
+    switch (arg) {
+        case '--vcs':
+            data.vcs = argIterator.next().value;
+            break;
+
+        case '-a':
+        case '--archetype':
+            data.archetype = argIterator.next().value;
+            break;
+
+        case '-h':
+        case '--help':
+            outputHelp();
+            process.exit(1);
+            break;
+
+        default:
+            data._.push(arg);
+    }
+}
+
+if (data._.length != 2) {
+    outputHelp();
+    process.exit(1);
+}
+
+if (!vcsCommand[data.vcs]) {
+    outputHelp();
+    process.exit(1);
+}
+
+if (!availableArchetypes[data.archetype]) {
+    outputHelp();
+    process.exit(1);
+}
+
+var command = 'mvn archetype:generate ' +
+    '-DgroupId=%s ' +
+    '-DartifactId=%s ' +
+    '-DarchetypeGroupId=%s ' +
+    '-DarchetypeArtifactId=%s ' +
+    '-DinteractiveMode=false';
+
+var archetype = availableArchetypes[data.archetype];
+var applyArgs = [command].concat(data._).concat([
+    archetype.archetypeGroupId,
+    archetype.archetypeArtifactId
+]);
+var formattedCommand = util.format.apply(null, applyArgs);
+
+execSync(formattedCommand);
+try {
+    execSync('curl "https://raw.githubusercontent.com/github/gitignore/master/Maven.gitignore" > .gitignore', {
+        cwd: data._[1]
+    });
+    vcsCommand[data.vcs].forEach(function(command) {
+        execSync(command, { cwd: data._[1] });
+    });
+} catch (e) {
+    execSync('rm -rf ' + data._[1]);
+    util.log(e);
+    process.exit(1);
+}
