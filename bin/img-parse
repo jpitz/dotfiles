@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+mkdir tesseract
+mkdir gocr
+mkdir ocrad
+
+for file in $(find out -type f -maxdepth 1 -exec basename {} \; | grep -v .DS_Store); do
+    echo "Converting $file..."
+
+    tesseract out/$file tesseract/$file -l eng
+    #gocr -i out/$file -o gocr/$file.txt
+    #ocrad -o ocrad/$file.txt out/$file
+done

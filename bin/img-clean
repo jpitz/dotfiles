@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+rm -rf tmp unpaper out
+mkdir tmp unpaper out
+
+for file in $(find . -type f -maxdepth 1 -exec basename {} \; | grep -v .DS_Store); do
+    echo "Converting $file..."
+    convert $file \
+        -density 600 \
+        -resize 960 \
+        -colorspace gray \
+        -format tiff \
+        tmp/$file.tiff
+    # unpaper \
+    #     --blackfilter-scan-exclude \
+    #     --noisefilter-intensity \
+    #     tmp/$file.pbm \
+    #     unpaper/$file.tiff
+    textcleaner \
+        -f 25 -o 20 -t 30 -u -s 1 -T -p 20 \
+        tmp/$file.tiff \
+        out/$file.tiff
+    #convert $file \
+    #    -density 300 \
+    #    -flatten \
+    #    -channel Black \
+    #    -colorspace Gray \
+    #    -separate \
+    #    -despeckle \
+    #    -enhance \
+    #    -equalize \
+    #    -intensity Lightness \
+    #    -normalize \
+    #    out/$file.tif
+done
