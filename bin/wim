@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+if [ $# -lt 1 ]; then
+  echo "usage: wim <command>"
+  exit 1
+fi
+
+vim `which $1`
