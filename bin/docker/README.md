@@ -4,8 +4,8 @@ All scripts provided in the above bin directory provide a dynamic way of using c
 This scripts were exclusively targeted toward OSX but can be adjusted for linux.
 
 ```
-boot2docker init
-boot2docker up
+docker-machine init
+docker-machine up
 docker-consul
 docker-configure-dns
 ```

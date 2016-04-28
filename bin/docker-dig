@@ -10,4 +10,4 @@ exit 1
 fi
 
 container_name=$1
-dig @$(boot2docker ip) -p 8600 ${container_name}.node.consul ANY
+dig @$(docker-machine ip dev) -p 8600 ${container_name}.node.consul ANY

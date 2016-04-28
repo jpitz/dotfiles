@@ -5,8 +5,10 @@ docker run -dt -h node \
     --name="${container_name}" \
     --hostname="${container_name}" \
     -p 53:53/udp \
+    -p 8301:8301/udp \
     -p 8500:8500 \
     progrium/consul \
+    -dc=${DOCKER_MACHINE_NAME} \
     -server \
     -bootstrap \
-    -advertise $(boot2docker ip)
+    -advertise $(docker-machine ip dev)

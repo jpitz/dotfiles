@@ -10,13 +10,13 @@ exit 1
 fi
 
 for i in "$@"; do
-    container_name=$1
+    container_name=$i
     container_ip=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' $container_name)
     container_hostname=$(docker inspect --format '{{ .Config.Hostname }}' $container_name)
 
     json="{\"Node\":\"${container_hostname}\",\"Address\":\"${container_ip}\"}"
 
-    curl -o /dev/null -q -s -X PUT -d "${json}" http://$(boot2docker ip):8500/v1/catalog/register
+    curl -o /dev/null -q -s -X PUT -d "${json}" http://$(docker-machine ip dev):8500/v1/catalog/register
 
     echo "Registered ${container_name} at ${container_ip}"
 done

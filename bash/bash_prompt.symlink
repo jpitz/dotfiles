@@ -5,6 +5,8 @@ c_reset='\[\033[0m\]'
 c_user='\[\033[33m\]'
 c_host='\[\033[34m\]'
 c_path='\[\033[36m\]'
+c_docker_alive='\[\033[32;1m\]'
+c_docker_dead='\[\033[31;1m\]'
 
 working_directory() {
     echo "${c_user}\u${c_reset}@${c_host}\h${c_reset} ${c_path}\w${c_reset}"
@@ -111,8 +113,26 @@ parse_repo() {
     echo "$(parse_git_branch)$(parse_local_state $git_dir)$(parse_remote_state)"
 }
 
+parse_docker_info() {
+    if [ -z "${DOCKER_MACHINE_NAME}" ]; then
+      return
+    fi
+
+    out=" "
+    if [ "$(docker-machine status ${DOCKER_MACHINE_NAME})" == "Running" ]; then
+        out="$out${c_docker_alive}"
+    else
+        out="$out${c_docker_dead}"
+    fi
+
+    running=$(docker ps -q | wc -l)
+    total=$(docker ps -aq | wc -l)
+
+    echo "$out${DOCKER_MACHINE_NAME}${c_reset} ${running}/${total}"
+}
+
 prompt() {
-    PS1="\n[$(working_directory)$(parse_repo)]\n$ "
+    PS1="\n[$(working_directory)$(parse_repo)$(parse_docker_info)]\n$ "
 }
 
 PROMPT_COMMAND=prompt

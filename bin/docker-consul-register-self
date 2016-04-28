@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 #
-json="{\"Node\":\"$(hostname)\",\"Address\":\"$(boot2docker ip)\"}"
-curl -o /dev/null -q -s -X PUT -d "${json}" http://$(boot2docker ip):8500/v1/catalog/register
+json="{\"Node\":\"$(hostname)\",\"Address\":\"$(docker-machine ip dev)\"}"
+curl -o /dev/null -q -s -X PUT -d "${json}" http://$(docker-machine ip dev):8500/v1/catalog/register

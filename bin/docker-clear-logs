@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+for i in "$@"; do
+  file=$(docker inspect $i | grep -G '"LogPath": "*"' | sed -e 's/.*"LogPath": "//g' | sed -e 's/",//g')
+
+  if [ "$(uname)" == "Darwin" ]; then
+    docker-machine ssh ${DOCKER_MACHINE_NAME} "sudo rm ${file}"
+  else
+    rm $file
+  fi
+done
+

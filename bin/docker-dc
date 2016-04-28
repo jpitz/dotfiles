@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+if [ $# -lt 1 ]; then
+  echo "usage: . docker-dc <machine-name>"
+fi
+
+eval $(docker-machine env $1)
+
