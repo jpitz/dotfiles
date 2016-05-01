@@ -15,6 +15,7 @@ create_development_directories() {
     mkdir -p ~/Development/github
     mkdir -p ~/Development/sandbox
     mkdir -p ~/Development/zulu
+    mkdir -p ~/Development/auroral
 }
 
 link_files() {
@@ -70,6 +71,12 @@ install_brew_packages() {
     brew install m4
     brew install make
     brew install nano
+    brew install docker
+    brew install docker-machine
+    brew install docker-compose
+    brew install ag
+    brew cask install virtualbox
+    brew install reattach-to-user-namespace
     brew doctor
 }
 

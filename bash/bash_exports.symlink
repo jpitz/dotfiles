@@ -2,13 +2,19 @@ export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
 export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 
-if [ "$(docker-machine status dev)" != "Running" ]; then
-  echo "docker-machine dev is not running"
+if [ ! -z "$(docker-machine ls | awk '{print $4}' | grep -i running)" ]; then
+  if [ "$(docker-machine status dev)" != "Running" ]; then
+    echo "docker-machine dev is not running"
+  else
+    export DOCKER_CONSUL_IP=$(docker-machine ip dev)
+  fi
+
+  if [ ! -z "${DOCKER_MACHINE_NAME}" ]; then
+     . ${HOME}/.dotfiles/bin/docker-dc ${DOCKER_MACHINE_NAME} 2> /dev/null
+  fi
 fi
 
-export DOCKER_CONSUL_IP=$(docker-machine ip dev)
- . ${HOME}/.dotfiles/bin/docker-dc ${DOCKER_MACHINE_NAME} 2> /dev/null
-
+export ZULU_PROJECT_DIR=~/Development/zulu
 export AURORAL_PROJECT_DIR=~/Development/auroral
 
 # Fix for maven builds

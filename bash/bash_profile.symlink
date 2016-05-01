@@ -16,7 +16,7 @@ function serve() {
 #---------------------------#
 # Application Scripts
 #---------------------------#
-. /usr/local/Cellar/z/1.8/etc/profile.d/z.sh
+. $(brew --prefix z)/etc/profile.d/z.sh
 
 if [ -f $(brew --prefix)/etc/bash_completion ]; then
     . $(brew --prefix)/etc/bash_completion
