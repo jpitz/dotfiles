@@ -7,6 +7,8 @@ c_host='\[\033[34m\]'
 c_path='\[\033[36m\]'
 c_docker_alive='\[\033[32;1m\]'
 c_docker_dead='\[\033[31;1m\]'
+c_docker_running='\[\033[35;1m\]'
+c_docker_total='\[\033[35;1m\]'
 
 working_directory() {
     echo "${c_user}\u${c_reset}@${c_host}\h${c_reset} ${c_path}\w${c_reset}"
@@ -128,7 +130,7 @@ parse_docker_info() {
     running=$(docker ps -q | wc -l)
     total=$(docker ps -aq | wc -l)
 
-    echo "$out${DOCKER_MACHINE_NAME}${c_reset} ${running}/${total}"
+    echo "$out${DOCKER_MACHINE_NAME}${c_reset} ${c_docker_running}${running}${c_reset}/${c_docker_total}${total}${c_reset}"
 }
 
 prompt() {
