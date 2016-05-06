@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+echo "Configuring dns for ${DOCKER_MACHINE_NAME}"
+
+echo "Adding node to available networks"
+while read network; do
+    current_domains=$(networksetup -getsearchdomains "${network}" | tr '\n' ' ')
+
+    if [ ! -z "$(echo ${current_domains} | grep "There aren't any Search Domains set on" )" ]; then
+        current_domains=$(scutil --dns | sed -n "0,/nameserver/{s/ *search domain\[[0-9]*\] : \(.*\)/\1/p}" | tr '\n' ' ')
+    fi
+
+    if [ -z "$(echo ${current_domains} | grep "node.consul")" ]; then
+        echo "Adding node.consul to search domains"
+        sudo networksetup -setsearchdomains "${network}" $current_domains node.consul
+    fi
+done < <(networksetup -listallnetworkservices | sed 1d)
+
+echo "Configuring Local DNS"
+
+readonly DOCKER_MACHINE_IP=$(docker-machine ip ${DOCKER_MACHINE_NAME})
+
+if [ ! -d "/etc/resolver" ]; then
+    sudo mkdir /etc/resolver
+fi
+
+echo "nameserver ${DOCKER_MACHINE_IP}" | sudo tee /etc/resolver/node.consul &>/dev/null
+
+sudo route -q delete '172.30.254.0/24' &>/dev/null
+sudo route -q add '172.30.254.0/24' "${DOCKER_MACHINE_IP}"
+
+sudo launchctl stop homebrew.mxcl.dnsmasq
+sudo launchctl start homebrew.mxcl.dnsmasq

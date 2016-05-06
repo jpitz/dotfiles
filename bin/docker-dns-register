@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+if [ $# -lt 1 ]; then
+cat <<EOF
+  usage: docker-dns-register <container> [container...]
+
+  Register all specified containers into consul for DNS resolution
+EOF
+exit 1
+fi
+
+for i in "$@"; do
+    container_name=$i
+    container_ip=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${container_name})
+    container_hostname=$(docker inspect --format '{{ .Config.Hostname }}' ${container_name})
+
+    json="{\"Node\":\"${container_hostname}\",\"Address\":\"${container_ip}\"}"
+
+    curl -o /dev/null -q -s -X PUT -d "${json}" http://$(docker-machine ip ${DOCKER_MACHINE_NAME}):8500/v1/catalog/register
+
+    echo "Registered ${container_name} at ${container_ip}"
+done

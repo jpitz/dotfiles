@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-container_name=mongo
-docker-destroy ${container_name}
-docker-run \
-    --name="${container_name}" \
-    --hostname="${container_name}" \
-    mongo
-docker-consul-register ${container_name}

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 container_name=consul
 docker-destroy ${container_name}
 docker run -dt -h node \
@@ -11,4 +12,7 @@ docker run -dt -h node \
     -dc=${DOCKER_MACHINE_NAME} \
     -server \
     -bootstrap \
-    -advertise $(docker-machine ip dev)
+    -advertise $(docker-machine ip ${DOCKER_MACHINE_NAME})
+
+docker-dns-register-all
+docker-dns-configure

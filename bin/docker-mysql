@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-container_name=mysql
-docker-destroy ${container_name}
-docker-run \
-    --name="${container_name}" \
-    --hostname="${container_name}" \
-    -e MYSQL_ROOT_PASSWORD=root \
-    mysql
-docker-consul-register ${container_name}

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+readonly machine_ip=$(docker-machine ip ${DOCKER_MACHINE_NAME})
+
+for ip in $(my-ip); do
+    json="{\"Node\":\"$(hostname)\",\"Address\":\"${ip}\"}"
+    curl -o /dev/null -q -s -X PUT -d "${json}" http://${machine_ip}:8500/v1/catalog/register
+done
