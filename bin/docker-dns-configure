@@ -7,11 +7,11 @@ while read network; do
     current_domains=$(networksetup -getsearchdomains "${network}" | tr '\n' ' ')
 
     if [ ! -z "$(echo ${current_domains} | grep "There aren't any Search Domains set on" )" ]; then
-        current_domains=$(scutil --dns | sed -n "0,/nameserver/{s/ *search domain\[[0-9]*\] : \(.*\)/\1/p}" | tr '\n' ' ')
+        current_domains=$(scutil --dns | grep "search domain"| awk '{print $4}' | sort | uniq | tr '\n' ' ')
     fi
 
     if [ -z "$(echo ${current_domains} | grep "node.consul")" ]; then
-        echo "Adding node.consul to search domains"
+        echo "Adding node.consul to search domains for ${network}"
         sudo networksetup -setsearchdomains "${network}" $current_domains node.consul
     fi
 done < <(networksetup -listallnetworkservices | sed 1d)
@@ -26,6 +26,7 @@ fi
 
 echo "nameserver ${DOCKER_MACHINE_IP}" | sudo tee /etc/resolver/node.consul &>/dev/null
 
+# This ip prefix needs to match th bind ip of the docker machine set in docker-dns-create
 sudo route -q delete '172.30.254.0/24' &>/dev/null
 sudo route -q add '172.30.254.0/24' "${DOCKER_MACHINE_IP}"
 

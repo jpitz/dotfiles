@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 container_name=consul
-docker-destroy ${container_name}
+
+docker rm ${container_name} &>/dev/null
+
 docker run -dt -h node \
     --name="${container_name}" \
     --hostname="${container_name}" \
@@ -13,6 +15,3 @@ docker run -dt -h node \
     -server \
     -bootstrap \
     -advertise $(docker-machine ip ${DOCKER_MACHINE_NAME})
-
-docker-dns-register-all
-docker-dns-configure

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+for machine_name in "$@"; do true; done
+
+docker-dns-create "$@"
+ . docker-dc ${machine_name}
+docker-dns-init
+docker-dns-register-all
+docker-dns-configure
