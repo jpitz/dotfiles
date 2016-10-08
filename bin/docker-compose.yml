@@ -1,0 +1,44 @@
+##
+## Defines the base image everything is intended to extend. This image contains
+## the basic docker components for using consul as a DNS host and resolving
+## container names.
+##
+base:
+  container_name: ${DOCKER_BOOT_NAME}
+  hostname: ${DOCKER_BOOT_NAME}
+  environment:
+    DOCKER_BOOT_NAME: ${DOCKER_BOOT_NAME}
+  dns:
+    - 8.8.8.8
+    - 8.8.4.4
+    - ${DOCKER_CONSUL_IP}
+  dns_search:
+    - node.consul
+  image: 'apache:2.4'
+
+##
+## Canonical method for running java based applications.
+##
+jre8:
+  extends: 'base'
+  expose:
+    - 8080
+  volumes:
+    - ${DOCKER_BOOT_TARGET_DIR}:/var/local/daemon
+  working_dir: '/var/local/daemon'
+  image: 'java:8-jre'
+  command: 'java -jar ${DOCKER_BOOT_NAME}.jar'
+
+##
+## Canonical method for running a mysql container.
+##
+mysql:
+  extends: 'base'
+  environment:
+    MYSQL_ROOT_PASSWORD: ${DOCKER_BOOT_NAME}
+    MYSQL_DATABASE: ${DOCKER_BOOT_NAME}
+    MYSQL_USER: ${DOCKER_BOOT_NAME}
+    MYSQL_PASSWORD: ${DOCKER_BOOT_NAME}
+  expose:
+    - 3306
+  image: 'mysql:5.6'

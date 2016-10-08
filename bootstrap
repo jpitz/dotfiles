@@ -76,9 +76,14 @@ install_brew_packages() {
     brew install docker-compose
     brew install ag
     brew cask install virtualbox
+    brew cask install java
     brew install reattach-to-user-namespace
     brew install dnsmasq
     brew doctor
+}
+
+install_3rdparty() {
+    sudo gem install jekyll bundler
 }
 
 install_vundle() {

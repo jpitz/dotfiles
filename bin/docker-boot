@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+readonly current_dir=$(pwd)
+readonly THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+if [ $# -lt 2 ]; then
+    echo "usage: docker-boot <image> <name> [targetDir]"
+    exit 1
+fi
+
+readonly DOCKER_IMAGE_NAME="${1}"
+export DOCKER_BOOT_NAME="${2}"
+
+if [ ! -z "${3}" ]; then
+    export DOCKER_BOOT_TARGET_DIR="${3}"
+else
+    export DOCKER_BOOT_TARGET_DIR="${current_dir}"
+fi
+
+if [ ! -z "$(docker ps -a | grep ${DOCKER_BOOT_NAME})" ]; then
+    echo "Attempting to stop and remove existing container"
+    docker stop ${DOCKER_BOOT_NAME} &>/dev/null
+    docker rm ${DOCKER_BOOT_NAME} &>/dev/null
+fi
+
+docker-compose -f ${THIS_DIR}/docker-compose.yml up -d ${DOCKER_IMAGE_NAME}
+docker-dns-register ${DOCKER_BOOT_NAME}
+
+unset DOCKER_BOOT_NAME
+unset DOCKER_BOOT_TARGET_DIR

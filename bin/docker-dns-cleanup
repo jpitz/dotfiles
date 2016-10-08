@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+readonly egrep_expression="($(ls -1 /etc/resolver/ | tr $'\n' '|' | sed 's/|$//'))"
+
+while read network; do
+  current_domains=$(networksetup -getsearchdomains "${network}" | tr $'\n' ' ')
+  if [ ! -z "$(echo ${current_domains} | grep "There aren't any Search Domains set on" )" ]; then
+    current_domains=$(scutil --dns | grep "search domain" | awk '{print $4}' | sort | uniq | tr '\n' ' ')
+  fi
+
+  original_domains=$(echo ${current_domains} | sed -r "s/${egrep_expression}//g")
+  sudo networksetup -setsearchdomains "${network}" ${original_domains}
+done < <(networksetup -listallnetworkservices | sed 1d)
+

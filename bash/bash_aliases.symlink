@@ -11,4 +11,5 @@ alias ll='ls -la'
 alias l='ls -la'
 alias sublime='/Applications/Sublime\ Text.app/Contents/MacOS/Sublime\ Text &'
 alias docker-dc='. `which docker-dc`'
+alias dm="docker-machine"
 

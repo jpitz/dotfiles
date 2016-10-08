@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+#readonly resolver_name="${DOCKER_MACHINE_NAME}.${USER}.net"
+readonly resolver_name="node.consul"
+
 echo "Configuring dns for ${DOCKER_MACHINE_NAME}"
 
 echo "Adding node to available networks"
@@ -10,9 +13,9 @@ while read network; do
         current_domains=$(scutil --dns | grep "search domain"| awk '{print $4}' | sort | uniq | tr '\n' ' ')
     fi
 
-    if [ -z "$(echo ${current_domains} | grep "node.consul")" ]; then
-        echo "Adding node.consul to search domains for ${network}"
-        sudo networksetup -setsearchdomains "${network}" $current_domains node.consul
+    if [ -z "$(echo ${current_domains} | grep ${resolver_name})" ]; then
+        echo "Adding ${resolver_name} to search domains for ${network}"
+        sudo networksetup -setsearchdomains "${network}" ${current_domains} ${resolver_name}
     fi
 done < <(networksetup -listallnetworkservices | sed 1d)
 
@@ -24,7 +27,7 @@ if [ ! -d "/etc/resolver" ]; then
     sudo mkdir /etc/resolver
 fi
 
-echo "nameserver ${DOCKER_MACHINE_IP}" | sudo tee /etc/resolver/node.consul &>/dev/null
+echo "nameserver ${DOCKER_MACHINE_IP}" | sudo tee /etc/resolver/${resolver_name} &>/dev/null
 
 # This ip prefix needs to match th bind ip of the docker machine set in docker-dns-create
 sudo route -q delete '172.30.254.0/24' &>/dev/null
