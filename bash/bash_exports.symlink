@@ -28,13 +28,13 @@ export LSCOLORS=GxFxCxDxBxegedabagaced
 export GOPATH="$HOME/Development/go"
 export GOROOT="$(brew --prefix go)/libexec"
 
-PATH=$HOME/.dotfiles/bin:$PATH
 PATH=/usr/local/bin:$PATH
 PATH=$PATH:/usr/local/sbin
 PATH=$PATH:~/bin
 PATH=$PATH:/usr/local/opt/go/libexec/bin
 PATH=$PATH:$GOPATH/bin
 PATH=~/.local/bin:$PATH
+PATH=$HOME/.dotfiles/bin:$PATH
 
 if [ -d "$(brew --prefix coreutils)/libexec/gnubin" ]; then
     PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"

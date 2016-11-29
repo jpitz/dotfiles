@@ -5,3 +5,4 @@ if [ $# -lt 1 ]; then
 fi
 
 eval $(docker-machine env $1)
+docker-dns-configure
