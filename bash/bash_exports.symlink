@@ -2,16 +2,14 @@ export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
 export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 
-if [ ! -z "$(docker-machine ls | awk '{print $4}' | grep -i running)" ]; then
-  if [ "$(docker-machine status dev)" != "Running" ]; then
-    echo "docker-machine dev is not running"
-  else
-    export DOCKER_CONSUL_IP=$(docker-machine ip dev)
-  fi
-
-  if [ ! -z "${DOCKER_MACHINE_NAME}" ]; then
-     . ${HOME}/.dotfiles/bin/docker-dc ${DOCKER_MACHINE_NAME} 2> /dev/null
-  fi
+if [ -z "$(docker-machine ls | awk '{print $4}' | grep -i running)" ]; then
+  echo "No available docker-machines to attach to"
+elif [ ! -z "${DOCKER_MACHINE_NAME}" ]; then
+. ${HOME}/.dotfiles/bin/docker-dc ${DOCKER_MACHINE_NAME} 2> /dev/null
+elif [ "$(docker-machine status dev)" != "Running" ]; then
+  echo "docker-machine dev is not running"
+else
+. ${HOME}/.dotfiles/bin/docker-dc dev
 fi
 
 export ZULU_PROJECT_DIR=~/Development/zulu

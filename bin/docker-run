@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-consul_ip=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' consul)
+consul_ip=$(docker-dns-ip)
 
 docker run -dt \
     --dns-search=node.consul \

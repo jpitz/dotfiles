@@ -10,7 +10,7 @@ fi
 
 readonly DOCKER_IMAGE_NAME="${1}"
 export DOCKER_BOOT_NAME="${2}"
-export DOCKER_CONSUL_IP=$(docker-machine ip ${DOCKER_MACHINE_NAME})
+export DOCKER_CONSUL_IP=$(docker-dns-ip)
 
 if [ ! -z "${3}" ]; then
     export DOCKER_BOOT_TARGET_DIR="$(readlink -f $3)"

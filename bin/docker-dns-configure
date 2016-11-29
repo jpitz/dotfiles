@@ -28,7 +28,7 @@ fi
 
 echo "nameserver ${DOCKER_MACHINE_IP}" | sudo tee /etc/resolver/${resolver_name} &>/dev/null
 
-# This ip prefix needs to match th bind ip of the docker machine set in docker-dns-create
+# This ip prefix needs to match the bind ip of the docker machine set in docker-dns-create
 sudo route -q delete '172.30.254.0/24' &>/dev/null
 sudo route -q add '172.30.254.0/24' "${DOCKER_MACHINE_IP}"
 
