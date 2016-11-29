@@ -10,12 +10,18 @@ fi
 
 readonly DOCKER_IMAGE_NAME="${1}"
 export DOCKER_BOOT_NAME="${2}"
+export DOCKER_CONSUL_IP=$(docker-machine ip ${DOCKER_MACHINE_NAME})
 
 if [ ! -z "${3}" ]; then
-    export DOCKER_BOOT_TARGET_DIR="${3}"
+    export DOCKER_BOOT_TARGET_DIR="$(readlink -f $3)"
 else
     export DOCKER_BOOT_TARGET_DIR="${current_dir}"
 fi
+
+echo "DOCKER_IMAGE_NAME=${DOCKER_IMAGE_NAME}"
+echo "DOCKER_BOOT_NAME=${DOCKER_BOOT_NAME}"
+echo "DOCKER_BOOT_TARGET_DIR=${DOCKER_BOOT_TARGET_DIR}"
+echo "DOCKER_CONSUL_IP=${DOCKER_CONSUL_IP}"
 
 if [ ! -z "$(docker ps -a | grep ${DOCKER_BOOT_NAME})" ]; then
     echo "Attempting to stop and remove existing container"

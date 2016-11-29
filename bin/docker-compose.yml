@@ -9,9 +9,9 @@ base:
   environment:
     DOCKER_BOOT_NAME: ${DOCKER_BOOT_NAME}
   dns:
+    - ${DOCKER_CONSUL_IP}
     - 8.8.8.8
     - 8.8.4.4
-    - ${DOCKER_CONSUL_IP}
   dns_search:
     - node.consul
   image: 'apache:2.4'
@@ -42,3 +42,42 @@ mysql:
   expose:
     - 3306
   image: 'mysql:5.6'
+
+##
+## Canonical method for running an aws-sqs container
+##
+aws-sqs:
+  extends: 'base'
+  expose:
+    - 4100
+  image: 'pafortin/goaws'
+
+##
+## Canonical method for running an aws-sns container
+##
+aws-sns:
+  extends: 'aws-sqs'
+
+##
+## Canonical method for running an aws-dynamodb container
+##
+aws-dynamodb:
+  extends: 'base'
+  expose:
+    - 8000
+  image: 'deangiberson/aws-dynamodb-local'
+
+##
+## Canonincal method for running an hbase container
+##
+hbase:
+  extends: 'base'
+  expose:
+    - 9095    # thrift webui
+    - 9090
+    - 8085    # rest webui
+    - 8080
+    - 2181    # zk
+    - 16010   # hbase master
+  image: 'dajobe/hbase'
+

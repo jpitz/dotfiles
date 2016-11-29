@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-#readonly resolver_name="${DOCKER_MACHINE_NAME}.${USER}.net"
 readonly resolver_name="node.consul"
 
 echo "Configuring dns for ${DOCKER_MACHINE_NAME}"
@@ -33,5 +32,12 @@ echo "nameserver ${DOCKER_MACHINE_IP}" | sudo tee /etc/resolver/${resolver_name}
 sudo route -q delete '172.30.254.0/24' &>/dev/null
 sudo route -q add '172.30.254.0/24' "${DOCKER_MACHINE_IP}"
 
-sudo launchctl stop homebrew.mxcl.dnsmasq
-sudo launchctl start homebrew.mxcl.dnsmasq
+readonly plist_file="homebrew.mxcl.dnsmasq.plist"
+readonly plist_path="/Library/LaunchDaemons"
+sudo cp $(brew list dnsmasq | grep ${plist_file}$) ${plist_path}
+sudo launchctl unload ${plist_path}/${plist_file}
+sudo launchctl load ${plist_path}/${plist_file}
+
+sudo dscacheutil -flushcache
+sudo killall -HUP mDNSResponder
+

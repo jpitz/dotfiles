@@ -4,7 +4,9 @@ container_name=consul
 
 docker rm ${container_name} &>/dev/null
 
-docker run -dt -h node \
+docker run -d \
+    --dns 127.0.0.1 \
+    --restart=always \
     --name="${container_name}" \
     --hostname="${container_name}" \
     -p 53:53/udp \
@@ -15,3 +17,4 @@ docker run -dt -h node \
     -server \
     -bootstrap \
     -advertise $(docker-machine ip ${DOCKER_MACHINE_NAME})
+
