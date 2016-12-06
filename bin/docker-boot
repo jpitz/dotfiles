@@ -1,36 +1,62 @@
-#!/usr/bin/env bash
+#!/usr/bin/env ruby
+require 'yaml'
 
-readonly current_dir=$(pwd)
-readonly THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+current_dir=Dir.pwd
+this_dir=__dir__
 
-if [ $# -lt 2 ]; then
-    echo "usage: docker-boot <image> <name> [targetDir]"
-    exit 1
-fi
-
-readonly DOCKER_IMAGE_NAME="${1}"
-export DOCKER_BOOT_NAME="${2}"
-export DOCKER_CONSUL_IP=$(docker-dns-ip)
-
-if [ ! -z "${3}" ]; then
-    export DOCKER_BOOT_TARGET_DIR="$(readlink -f $3)"
+if ARGV.length < 2 and File.file?("#{current_dir}/docker-boot.db") then
+    handle=File.open("#{current_dir}/docker-boot.db").read
+    handle.each_line do |line|
+        if line.chomp!.length > 0 then
+            system("docker-boot-2 #{line}")
+        end
+    end
+elsif ARGV.length < 2 then
+    puts "usage: docker-boot-2 <image> <name> [targetDir]"  
+    SystemExit.new(1)
 else
-    export DOCKER_BOOT_TARGET_DIR="${current_dir}"
-fi
+    DOCKER_IMAGE_NAME=ARGV[0]
+    DOCKER_BOOT_NAME=ARGV[1]
 
-echo "DOCKER_IMAGE_NAME=${DOCKER_IMAGE_NAME}"
-echo "DOCKER_BOOT_NAME=${DOCKER_BOOT_NAME}"
-echo "DOCKER_BOOT_TARGET_DIR=${DOCKER_BOOT_TARGET_DIR}"
-echo "DOCKER_CONSUL_IP=${DOCKER_CONSUL_IP}"
+    if ARGV.length > 2 then
+        DOCKER_BOOT_TARGET_DIR=File.absolute_path(ARGV[2])
+    else
+        DOCKER_BOOT_TARGET_DIR=current_dir
+    end
 
-if [ ! -z "$(docker ps -a | grep ${DOCKER_BOOT_NAME})" ]; then
-    echo "Attempting to stop and remove existing container"
-    docker stop ${DOCKER_BOOT_NAME} &>/dev/null
-    docker rm ${DOCKER_BOOT_NAME} &>/dev/null
-fi
+    DOCKER_CONSUL_IP=`docker-dns-ip`
 
-docker-compose -f ${THIS_DIR}/docker-compose.yml up -d ${DOCKER_IMAGE_NAME}
-docker-dns-register ${DOCKER_BOOT_NAME}
+    VARIABLES={
+        "DOCKER_IMAGE_NAME" => DOCKER_IMAGE_NAME,
+        "DOCKER_BOOT_NAME" => DOCKER_BOOT_NAME,
+        "DOCKER_BOOT_TARGET_DIR" => DOCKER_BOOT_TARGET_DIR,
+        "DOCKER_CONSUL_IP" => DOCKER_CONSUL_IP
+    }
 
-unset DOCKER_BOOT_NAME
-unset DOCKER_BOOT_TARGET_DIR
+    VARIABLES.each do |key, value|
+        puts key + '=' + value
+    end
+    
+    base=YAML::load_file("#{this_dir}/docker-compose.yml", Hash.new)
+
+    managed=YAML::load_file("#{this_dir}/docker-compose-managed.yml", Hash.new)
+    managed[DOCKER_BOOT_NAME] = base[DOCKER_IMAGE_NAME];
+
+    File.open("#{this_dir}/docker-compose-managed.yml", "w+") do |f|
+        f.write(managed.to_yaml)
+    end
+
+    system("docker stop #{DOCKER_BOOT_NAME} | xargs docker rm &>/dev/null")
+
+    COMMAND=[
+        "docker-compose",
+        "-f #{this_dir}/docker-compose.yml",
+        "-f #{this_dir}/docker-compose-managed.yml",
+        "up",
+        "-d",
+        "#{DOCKER_BOOT_NAME}"
+    ]
+
+    system(VARIABLES, COMMAND.join(' '))
+    system("docker-dns-register #{DOCKER_BOOT_NAME}")
+end

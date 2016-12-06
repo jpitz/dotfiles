@@ -3,7 +3,7 @@
 ## the basic docker components for using consul as a DNS host and resolving
 ## container names.
 ##
-base:
+boot-base:
   container_name: ${DOCKER_BOOT_NAME}
   hostname: ${DOCKER_BOOT_NAME}
   environment:
@@ -19,8 +19,8 @@ base:
 ##
 ## Canonical method for running java based applications.
 ##
-jre8:
-  extends: 'base'
+boot-jre8:
+  extends: 'boot-base'
   expose:
     - 8080
   volumes:
@@ -32,8 +32,8 @@ jre8:
 ##
 ## Canonical method for running a mysql container.
 ##
-mysql:
-  extends: 'base'
+boot-mysql:
+  extends: 'boot-base'
   environment:
     MYSQL_ROOT_PASSWORD: ${DOCKER_BOOT_NAME}
     MYSQL_DATABASE: ${DOCKER_BOOT_NAME}
@@ -46,8 +46,8 @@ mysql:
 ##
 ## Canonical method for running an aws-sqs container
 ##
-aws-sqs:
-  extends: 'base'
+boot-aws-sqs:
+  extends: 'boot-base'
   expose:
     - 4100
   image: 'pafortin/goaws'
@@ -55,14 +55,14 @@ aws-sqs:
 ##
 ## Canonical method for running an aws-sns container
 ##
-aws-sns:
-  extends: 'aws-sqs'
+boot-aws-sns:
+  extends: 'boot-aws-sqs'
 
 ##
 ## Canonical method for running an aws-dynamodb container
 ##
-aws-dynamodb:
-  extends: 'base'
+boot-aws-dynamodb:
+  extends: 'boot-base'
   expose:
     - 8000
   image: 'deangiberson/aws-dynamodb-local'
@@ -70,8 +70,8 @@ aws-dynamodb:
 ##
 ## Canonincal method for running an hbase container
 ##
-hbase:
-  extends: 'base'
+boot-hbase:
+  extends: 'boot-base'
   expose:
     - 9095    # thrift webui
     - 9090
