@@ -37,9 +37,8 @@ else
         puts key + '=' + value
     end
     
-    base=YAML::load_file("#{this_dir}/docker-compose.yml", Hash.new)
-
-    managed=YAML::load_file("#{this_dir}/docker-compose-managed.yml", Hash.new)
+    base=YAML::load_file("#{this_dir}/docker-compose.yml") || Hash.new
+    managed=YAML::load_file("#{this_dir}/docker-compose-managed.yml") || Hash.new
     managed[DOCKER_BOOT_NAME] = base[DOCKER_IMAGE_NAME];
 
     File.open("#{this_dir}/docker-compose-managed.yml", "w+") do |f|
