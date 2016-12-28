@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+for var in $(env | grep ^DOCKER | sed 's:=.*::'); do
+  echo $var
+  unset $var
+done

@@ -16,18 +16,32 @@ boot-base:
     - node.consul
   image: 'apache:2.4'
 
+boot-daemon:
+  extends: 'boot-base'
+  volumes:
+    - ${DOCKER_BOOT_TARGET_DIR}:/var/local/daemon
+  expose:
+    - 8080
+  working_dir: '/var/local/daemon'
+
+
 ##
 ## Canonical method for running java based applications.
 ##
 boot-jre8:
-  extends: 'boot-base'
-  expose:
-    - 8080
-  volumes:
-    - ${DOCKER_BOOT_TARGET_DIR}:/var/local/daemon
-  working_dir: '/var/local/daemon'
+  extends: 'boot-daemon'
   image: 'java:8-jre'
   command: 'java -jar ${DOCKER_BOOT_NAME}.jar'
+
+
+##
+## Canonical method for running a node based applications.
+##
+boot-node:
+  extends: 'boot-daemon'
+  image: 'node:6'
+  command: 'node index.js'
+
 
 ##
 ## Canonical method for running a mysql container.
@@ -42,6 +56,7 @@ boot-mysql:
   expose:
     - 3306
   image: 'mysql:5.6'
+
 
 ##
 ## Canonical method for running an aws-sqs container

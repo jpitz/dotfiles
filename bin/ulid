@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+readonly ENCODING="0123456789ABCDEFGHJKMNPQRSTVWXYZ"
+readonly ENCODING_LEN=32
+
+readonly TIME_LENGTH=10
+readonly RANDOM_LENGTH=16
+
+function now() {
+	echo $(( $(date +%s%N)/1000000 ))
+}
+
+function encodeTime() {
+	local now=$(( ${1} ))
+    local len=$2
+    local mod
+    local str=""
+
+    for i in $(seq 1 ${len}); do
+      mod=$(( now % ENCODING_LEN ))
+      str="${ENCODING:${mod}:1}${str}"
+      now=$(( (now - mod) / ENCODING_LEN ))
+    done
+
+    echo ${str}
+}
+
+function encodeRandom() {
+	local len=$1
+	local rand
+	local mod
+	local str=""
+
+	for i in $(seq 1 ${len}); do
+		rand=$(( $(od -vAn -N4 -tu < /dev/urandom) ))
+		mod=$(( ${rand} % ${ENCODING_LEN} ))
+		str="${str}${ENCODING:${mod}:1}"
+	done
+
+	echo ${str}
+}
+
+readonly time_bits=$(encodeTime $(now) ${TIME_LENGTH})
+readonly random_bits=$(encodeRandom ${RANDOM_LENGTH})
+
+echo "${time_bits}${random_bits}"
