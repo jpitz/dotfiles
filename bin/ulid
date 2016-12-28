@@ -1,45 +1,125 @@
 #!/usr/bin/env bash
+
+##########
+## Bash port of a ulid id generator specified alizain/ulid
+##
+## @author jpitz
+##########
+
+
+# Crockford's Base32 Encoding
 readonly ENCODING="0123456789ABCDEFGHJKMNPQRSTVWXYZ"
 readonly ENCODING_LEN=32
 
+# Chunk Sizes
 readonly TIME_LENGTH=10
 readonly RANDOM_LENGTH=16
 
+##########
+## Decoding Operations
+##########
+
+function ord() {
+  LC_CTYPE=C printf '%d' "'$1"
+}
+
+function binarySearch() {
+  local TARGET=$(ord $1)
+  local LENGTH=${ENCODING_LEN}
+
+  local START=0
+  local END=$(( LENGTH - 1 ))
+  local MIDDLE
+  local ITEM_AT_MIDDLE
+
+  while [ $START -le $END ]; do
+    MIDDLE=$(( START + ((END - START) / 2) ))
+    ITEM_AT_MIDDLE=$(ord ${ENCODING:${MIDDLE}:1})
+
+    if [ $ITEM_AT_MIDDLE -gt $TARGET ]; then
+      END=$(( MIDDLE - 1 ))
+    elif [ $ITEM_AT_MIDDLE -lt $TARGET ]; then
+      START=$(( MIDDLE + 1 ))
+    else
+      echo $MIDDLE
+      return 0
+    fi
+  done
+
+  echo "-1"
+}
+
+function decodeTime() {
+  local str=$1
+  local len=$(( $2 - 1 ))
+  local target
+
+  for i in $(seq 0 ${len}); do
+    target=${str:${i}:1}
+    mod=$(binarySearch ${target})
+
+    #what to do here?
+  done
+}
+
+##########
+## Encoding Operations
+##########
+
 function now() {
-	echo $(( $(date +%s%N)/1000000 ))
+  echo $(( $(date +%s%N) / 1000000 ))
 }
 
 function encodeTime() {
-	local now=$(( ${1} ))
-    local len=$2
-    local mod
-    local str=""
+  local len=$2
 
-    for i in $(seq 1 ${len}); do
-      mod=$(( now % ENCODING_LEN ))
-      str="${ENCODING:${mod}:1}${str}"
-      now=$(( (now - mod) / ENCODING_LEN ))
-    done
+  local mod
+  local str=""
+  local now=$(( ${1} ))
 
-    echo ${str}
+  for i in $(seq 1 ${len}); do
+    mod=$(( now % ENCODING_LEN ))
+    str="${ENCODING:${mod}:1}${str}"
+    now=$(( (now - mod) / ENCODING_LEN ))
+  done
+
+  echo ${str}
 }
 
 function encodeRandom() {
-	local len=$1
-	local rand
-	local mod
-	local str=""
+  local len=$1
 
-	for i in $(seq 1 ${len}); do
-		rand=$(( $(od -vAn -N4 -tu < /dev/urandom) ))
-		mod=$(( ${rand} % ${ENCODING_LEN} ))
-		str="${str}${ENCODING:${mod}:1}"
-	done
+  local rand
+  local mod
+  local str=""
 
-	echo ${str}
+  for i in $(seq 1 ${len}); do
+    rand=$(( $(od -vAn -N4 -tu < /dev/urandom) ))
+    mod=$(( ${rand} % ${ENCODING_LEN} ))
+    str="${str}${ENCODING:${mod}:1}"
+  done
+
+  echo ${str}
 }
 
-readonly time_bits=$(encodeTime $(now) ${TIME_LENGTH})
-readonly random_bits=$(encodeRandom ${RANDOM_LENGTH})
+##########
+## Main
+##########
 
-echo "${time_bits}${random_bits}"
+if [ $# -gt 0 ]; then
+  # decode the provided ulid's
+  echo "not done yet"
+  exit 1
+
+  for ulid in "$@"; do
+    time_bits=${ulid:0:$TIME_LENGTH}
+    # random_bits=${ulid:10:$RANDOM_LENGTH}
+    decodeTime ${time_bits} ${TIME_LENGTH}
+  done 
+else
+  #encode
+  readonly time_bits=$(encodeTime $(now) ${TIME_LENGTH})
+  readonly random_bits=$(encodeRandom ${RANDOM_LENGTH})
+
+  echo "${time_bits}${random_bits}"
+fi
