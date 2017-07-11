@@ -40,7 +40,7 @@ else
     if not File.exist?("#{this_dir}/docker-compose-managed.yml") then
         File.open("#{this_dir}/docker-compose-managed.yml", "w+")
     end
-    
+
     base=YAML::load_file("#{this_dir}/docker-compose.yml") || Hash.new
     managed=YAML::load_file("#{this_dir}/docker-compose-managed.yml") || Hash.new
     managed[DOCKER_BOOT_NAME] = base[DOCKER_IMAGE_NAME];
@@ -49,7 +49,7 @@ else
         f.write(managed.to_yaml)
     end
 
-    system("docker stop #{DOCKER_BOOT_NAME} | xargs docker rm &>/dev/null")
+    #system("docker stop #{DOCKER_BOOT_NAME} | xargs docker rm &>/dev/null")
 
     COMMAND=[
         "docker-compose",

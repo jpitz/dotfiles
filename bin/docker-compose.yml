@@ -58,6 +58,12 @@ boot-mysql:
   image: 'mysql:5.6'
 
 
+boot-mongo:
+  extends: 'boot-base'
+  expose:
+    - 27017
+  image: 'mongo:3.4'
+
 ##
 ## Canonical method for running an aws-sqs container
 ##
