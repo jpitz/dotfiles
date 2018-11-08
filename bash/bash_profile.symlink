@@ -22,15 +22,22 @@ if [ -f $(brew --prefix)/etc/bash_completion ]; then
     . $(brew --prefix)/etc/bash_completion
 fi
 
+function load_completion() {
+  if [[ -d ${1} ]]; then
+    for maybefile in $(ls ${1}); do
+      if [[ -f ${1}/${maybefile} ]]; then
+        . ${1}/${maybefile}
+      fi
+    done
+  fi
+}
+load_completion "/usr/local/etc/bash_completion.d/"
+
 #---------------------------#
 # Source the world
 #---------------------------#
 if [ -f ~/.bash_exports ]; then
     source ~/.bash_exports
-fi
-
-if [ -f ~/.docker_exports ]; then
-    source ~/.docker_exports
 fi
 
 if [ -f ~/.bash_aliases ]; then

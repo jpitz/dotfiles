@@ -13,8 +13,7 @@ docker run -d \
     -p 8301:8301/udp \
     -p 8500:8500 \
     progrium/consul \
-    -dc=${DOCKER_MACHINE_NAME} \
+    -dc=local \
     -server \
-    -bootstrap \
-    -advertise $(docker-machine ip ${DOCKER_MACHINE_NAME})
+    -bootstrap
 

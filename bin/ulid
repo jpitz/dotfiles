@@ -53,6 +53,7 @@ function decodeTime() {
   local str=$1
   local len=$(( $2 - 1 ))
   local target
+  local 
 
   for i in $(seq 0 ${len}); do
     target=${str:${i}:1}
@@ -70,6 +71,8 @@ function now() {
   echo $(( $(date +%s%N) / 1000000 ))
 }
 
+## left expansion
+## 9876543210
 function encodeTime() {
   local len=$2
 

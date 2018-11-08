@@ -12,3 +12,14 @@ alias l='ls -la'
 alias sublime='/Applications/Sublime\ Text.app/Contents/MacOS/Sublime\ Text &'
 alias docker-dc='. `which docker-dc`'
 alias dm="docker-machine"
+alias dc="docker-compose"
+alias sa="source ~/.bash_aliases"
+alias sp="source ~/.bash_profile"
+alias spmt="source ~/.bash_prompt"
+alias docker-disable-prompt="export DOCKER_DISABLE_PROMPT=true"
+
+function __dev_complete__() {
+  COMPREPLY=($(ls -1d "${HOME}/Development/${COMP_WORDS[@]:1}"* | sed "s:^${HOME}/Development/::" | sed "s:$:/:"))
+}
+complete -F __dev_complete__ dev
+

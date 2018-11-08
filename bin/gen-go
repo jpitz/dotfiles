@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+if [[ $# -lt 1 ]]; then
+cat <<EOF
+	gen-go <project> [user] [host]
+
+	Generates new go project. Path is computed as:
+
+	\${GOPATH}/src/\${host}/\${user}/\${project}
+EOF
+fi
+
+readonly project="${1}"
+readonly user="${2:-jpitz}"
+readonly host="${3:-github.com}"
+
+readonly path="${GOPATH}/src/${host}/${user}/${project}"
+mkdir -p "${path}"
+
+# make the main file
+cat > "${path}/${project}.go" <<EOF
+package main
+
+import (
+	"net/http"
+
+	"github.com/labstack/echo"
+)
+
+func main() {
+	app := echo.New()
+
+	app.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello, World!")
+	})
+
+	app.Logger.Fatal(app.Start(":8080"))
+}
+EOF
+
+cat > "${path}/README.md" <<EOF
+## ${project}
+EOF
+
+cat > "${path}/Makefile" <<EOF
+default: ${project}
+
+fmt:
+	go fmt
+
+test:
+	go test
+
+install:
+	go install
+
+${project}: install
+	${project}
+
+EOF

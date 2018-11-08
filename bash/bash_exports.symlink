@@ -2,21 +2,18 @@ export CLICOLOR=1
 export LSCOLORS=ExFxCxDxBxegedabagacad
 export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
 
-if [ -z "$(docker-machine ls | awk '{print $4}' | grep -i running)" ]; then
-  echo "No available docker-machines to attach to"
-elif [ ! -z "${DOCKER_MACHINE_NAME}" ]; then
-. ${HOME}/.dotfiles/bin/docker-dc ${DOCKER_MACHINE_NAME} 2> /dev/null
-elif [ "$(docker-machine status dev)" != "Running" ]; then
-  echo "docker-machine dev is not running"
-else
-. ${HOME}/.dotfiles/bin/docker-dc dev
-fi
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+nvm use --delete-prefix --silent 10
 
 export ZULU_PROJECT_DIR=~/Development/zulu
 export AURORAL_PROJECT_DIR=~/Development/auroral
 
 # Fix for maven builds
-export JAVA_VERSION=$(brew cask info java | head -n1 | sed 's/java:\s//' | sed 's/-b.*$//')
+#export JAVA_VERSION=$(echo "$(brew cask info java)" | head -n1 | sed 's/java:\s//' | sed 's/-b.*$//')
+export JAVA_VERSION=1.8.0_144
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk${JAVA_VERSION}.jdk/Contents/Home
 export LD_LIBRARY_PATH="$HOME/Development/.java.library.dir:$LD_LIBRARY_PATH"
 
@@ -40,6 +37,7 @@ if [ -d "$(brew --prefix coreutils)/libexec/gnubin" ]; then
     PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
 fi
 
-PATH="$(brew --prefix homebrew/php/php70)/bin:$PATH"
+PATH="$(brew --prefix php@7.0)/bin:$PATH"
 
+PATH="$HOME/Development/auroraio/bin:$PATH"
 export PATH

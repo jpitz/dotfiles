@@ -116,21 +116,18 @@ parse_repo() {
 }
 
 parse_docker_info() {
-    if [ -z "${DOCKER_MACHINE_NAME}" ]; then
-      return
+    if [ ! -z "${DOCKER_MACHINE_NAME}" ]; then
+        echo -n " ${DOCKER_MACHINE_NAME}${c_reset}"
     fi
 
-    out=" "
-    if [ "$(docker-machine status ${DOCKER_MACHINE_NAME})" == "Running" ]; then
-        out="$out${c_docker_alive}"
-    else
-        out="$out${c_docker_dead}"
+    if [ "${DOCKER_DISABLE_PROMPT}" = "true" ]; then
+        return
     fi
 
     running=$(docker ps -q | wc -l)
     total=$(docker ps -aq | wc -l)
 
-    echo "$out${DOCKER_MACHINE_NAME}${c_reset} ${c_docker_running}${running}${c_reset}/${c_docker_total}${total}${c_reset}"
+    echo -n " ${c_docker_running}${running}${c_reset}/${c_docker_total}${total}${c_reset}"
 }
 
 prompt() {
