@@ -16,9 +16,7 @@ function serve() {
 #---------------------------#
 # Application Scripts
 #---------------------------#
-. $(brew --prefix z)/etc/profile.d/z.sh
-
-if [ -f $(brew --prefix)/etc/bash_completion ]; then
+if [[ -f $(brew --prefix)/etc/bash_completion ]]; then
     . $(brew --prefix)/etc/bash_completion
 fi
 
@@ -31,23 +29,25 @@ function load_completion() {
     done
   fi
 }
-load_completion "/usr/local/etc/bash_completion.d/"
+#load_completion "/usr/local/etc/bash_completion.d/"
 
 #---------------------------#
 # Source the world
 #---------------------------#
-if [ -f ~/.bash_exports ]; then
+if [[ -f ~/.bash_exports ]]; then
     source ~/.bash_exports
 fi
 
-if [ -f ~/.bash_aliases ]; then
+if [[ -f ~/.bash_aliases ]]; then
     source ~/.bash_aliases
 fi
 
-if [ -f ~/.bash_prompt ]; then
+if [[ -f ~/.bash_prompt ]]; then
     source ~/.bash_prompt
 fi
 
 #if [[ ! $TERM =~ "screen" ]]; then
 #    exec tmux
 #fi
+
+export PATH="$HOME/.cargo/bin:$PATH"

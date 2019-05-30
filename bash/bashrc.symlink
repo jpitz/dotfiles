@@ -11,3 +11,7 @@ nvm use --delete-prefix 10 --silent
 # tabtab source for sls package
 # uninstall by removing these lines or running `tabtab uninstall sls`
 [ -f /Users/jpitz/.nvm/versions/node/v10.1.0/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.bash ] && . /Users/jpitz/.nvm/versions/node/v10.1.0/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.bash
+# added by travis gem
+[ -f /Users/jpitz/.travis/travis.sh ] && source /Users/jpitz/.travis/travis.sh
+PATH=/sbin:$PATH
+export PATH

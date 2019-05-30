@@ -130,8 +130,14 @@ parse_docker_info() {
     echo -n " ${c_docker_running}${running}${c_reset}/${c_docker_total}${total}${c_reset}"
 }
 
+parse_kube_info() {
+    if [ ! -z "${KUBECONFIG}" ]; then
+        echo -n " $(basename ${KUBECONFIG})"
+    fi
+}
+
 prompt() {
-    PS1="\n[$(working_directory)$(parse_repo)$(parse_docker_info)]\n$ "
+    PS1="\n[$(working_directory)$(parse_repo)$(parse_docker_info)$(parse_kube_info)]\n$ "
 }
 
 PROMPT_COMMAND=prompt
